@@ -1,4 +1,4 @@
-// SurveyFormReview shows users their form inputs for review
+// SurveyFormReview shows user their form inputs for review 
 import _ from 'lodash';
 import React from 'react';
 import { connect } from 'react-redux';
@@ -17,6 +17,7 @@ const SurveyFormReview = ({ onCancel, formValues, submitSurvey, history }) => {
       </div>
     );
   });
+
 
   return (
     <div>

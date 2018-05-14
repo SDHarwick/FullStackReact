@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const Path = require('path-parser');
+const { Path } = require('path-parser');
 const { URL } = require('url');
 const mongoose = require('mongoose');
 const requireLogin = require('../middlewares/requireLogin');
@@ -32,8 +32,8 @@ module.exports = app => {
           return { email, surveyId: match.surveyId, choice: match.choice };
         }
       })
-      .compact()
-      .uniqBy('email', 'surveyId')
+      .compact() // Removes any elements that are undefined
+      .uniqBy('email', 'surveyId') // Removes duplicate elements
       .each(({ surveyId, email, choice }) => {
         Survey.updateOne(
           {
@@ -54,6 +54,7 @@ module.exports = app => {
     res.send({});
   });
 
+
   app.post('/api/surveys', requireLogin, requireCredits, async (req, res) => {
     const { title, subject, body, recipients } = req.body;
 
@@ -61,12 +62,16 @@ module.exports = app => {
       title,
       subject,
       body,
+      // recipients: recipients.split(',').map(email => { return { email: email }})
+      // recipients: recipients.split(',').map(email => ({ email })),
       recipients: recipients.split(',').map(email => ({ email: email.trim() })),
       _user: req.user.id,
       dateSent: Date.now()
     });
 
-    // Great place to send an email!
+
+    // Send an email
+
     const mailer = new Mailer(survey, surveyTemplate(survey));
 
     try {
@@ -79,5 +84,6 @@ module.exports = app => {
     } catch (err) {
       res.status(422).send(err);
     }
+
   });
 };
